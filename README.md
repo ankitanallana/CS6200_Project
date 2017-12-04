@@ -11,15 +11,13 @@
 | Format:          | ```{'unigram_1':{'doc_id_9':frequency of unigram_1 in doc_id_9}, 'unigram_2':{'doc_id_4':frequency of unigram_4 in doc_id_4, 'doc_id_5':frequency of unigram_4 in doc_id_5}}``` |   
 
 
-_Unigrams_tf_table.txt_ - Term Frequencies of all terms in a text file
+_Unigrams_tf_table.txt_ - Term Frequencies of all terms in a **text** file
 
-_unigrams_tf.p_ - pickle file of all term frequencies
+| _unigrams_tf.p_ | pickle file of all term frequencies                                                                                                             |   
+|------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| Format:          | ```{'term_1': frequency of term_1, 'term_2': frequency of term_2}``` |   
 
-Format:
-
-```{'term_1': frequency of term_1, 'term_2': frequency of term_2}```
-
-Note that these are simply counts of terms over all of the corpus
+^^ Note that these are simply counts of terms over all of the corpus
 
  
 | stopped_corpus.p | corpus with stop words removed                                                                                                             |   
