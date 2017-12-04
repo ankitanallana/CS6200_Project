@@ -24,7 +24,8 @@ _Unigrams_tf_table.txt_ - Term Frequencies of all terms in a **text** file
  
 | stopped_corpus.p | corpus with stop words removed                                                                                                             |   
 |------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| Format:          | ```{'CACM-0270': ['techniques', 'storage','allocation'...],'CACM-1898': ['regular', 'coulomb', 'wave', 'functions', 'algorithm'] ... }``` |   
+| Format:          | ```{CACM-CACM-0620': 'ratfact algorithm 78 cacm halstead ca620312 jb',
+ 'CACM-CACM-1461': 'discussion summary operating systems cacm ca660311 jb' ... }``` |   
 
 
  
