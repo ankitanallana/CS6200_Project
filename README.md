@@ -1,6 +1,8 @@
 # CS6200 Project
 
-#### Documents
+Two folders - `data` and `code`
+
+#### Documents in folder `data`
 
 | _corpus.p_ | cleaned corpus in a pickle file                                                                                                             |   
 |------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
@@ -30,3 +32,10 @@ _Unigrams_tf_table.txt_ - Term Frequencies of all terms in a **text** file
 |------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
 | Format:          | ```{'CACM-0059': ['survei of progress and trend of develop and us of automat data process in busi and manag control system of the feder govern as of decemb 1957 iii cacm septemb 1959 ca590910 jb '], 'CACM-0060': ['the alpha vector transform of a system of linear constraint cacm septemb 1959 wersan s j ca590909 jb '] ... }``` |   
 
+
+=======
+Note that these are simply counts of terms over all of the corpus
+
+#### `code`
+
+This folder has four sub folders - one for each retrieval model - please place your code in the respective folder
