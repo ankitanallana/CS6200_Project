@@ -32,7 +32,7 @@ def initialize(indexFile):
     
     q = "";
     for query in queryFile:
-        q += query.replace("<DOC>", "").replace("<DOCNO>", "").replace(" </DOCNO>", ":").replace("</DOC>", "#").replace("\n", "");
+        q += query.replace("<DOC>", "").replace("<DOCNO>", "").replace(" </DOCNO>", ":").replace("</DOC>", "#").replace("\n", " ");
     query = q.split("#");
     query = query[:-1];
     for q in query:
@@ -43,6 +43,11 @@ def initialize(indexFile):
 def cleanLocation(location):
     location = location.replace('{','').replace('}','').replace(', ','#').replace(' ','').replace("'",'');
     return location;
+
+## Query string cleaner
+def cleanQuery(query):
+    query = query.lower().replace('{','').replace('}','').replace("[","").replace("]","").replace(',','').replace("'",'').replace("-", " ").replace(":","").replace("!","").replace("\t", " ").replace("\r"," ").replace("\n"," ").replace("(", "").replace(";", "").replace(")","").strip();
+    return query;
 
 ## Content string cleaner
 def cleanContent(content):
@@ -196,6 +201,7 @@ def main():
     queryID = 0
     for query in tqdm(queries):
         queryID = queryID + 1;
+        query = cleanQuery(query);  # clean the query
         queryTerms = query.split(" ");  # split query into query terms
         td = buildTermDocs(queryTerms);  # generate td
         tf = getTermFrequency(queryTerms); # generate tf   
