@@ -25,3 +25,6 @@ Python BM25.py -stemmed
 ```python
 Python BM25.py -stopped
 ```
+
+## Output
+Output files can be found in the root/data/BM25_Output folder
