@@ -3,6 +3,7 @@ import os
 import math
 import operator
 import pickle
+import re
 from collections import OrderedDict
 from tqdm import *
 
@@ -19,14 +20,12 @@ def initialize(indexFile):
 
     corpusDict = {};
     corpusSize = 0;
-    #invertedIndex = pickle.load( open("unigrams.p", "rb"));
     invertedIndex = pickle.load( open(indexFile + ".p", "rb"));
     
     if not os.path.exists("BM25_Output"):
         os.makedirs("BM25_Output");
 
     ## Build queries array from query file
-
     queryFile = open("cacm.query.txt", "r");
     queries = [];
     
@@ -46,8 +45,15 @@ def cleanLocation(location):
 
 ## Query string cleaner
 def cleanQuery(query):
-    query = query.lower().replace('{','').replace('}','').replace("[","").replace("]","").replace(',','').replace("'",'').replace("-", " ").replace(":","").replace("!","").replace("\t", " ").replace("\r"," ").replace("\n"," ").replace("(", "").replace(";", "").replace(")","").strip();
-    return query;
+    regex = "[{}':!,;()]*";
+    #regex = "[" + string.punctuation + "]*";
+    query = query.lower();
+    query = re.sub(regex, '', query);
+    query = query.replace('"', '');
+    regex = "\t\r\n";
+    query = re.sub(regex, " ", query);
+    query = query.strip();
+    return query
 
 ## Content string cleaner
 def cleanContent(content):
