@@ -3,7 +3,7 @@
 
 # ### Imports
 
-# In[1]:
+# In[332]:
 
 
 import os
@@ -11,20 +11,27 @@ import nltk
 import pickle
 import re
 from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize
 import string
 import collections
 import math
 import operator
 
 
-# #### Helper functions for cleaning corpus
+# ### Helper functions for cleaning corpus
 
-# In[2]:
+# In[333]:
 
 
 regex = "["+string.punctuation+"]*"
 timestamp_regex1 = "[A-Za-z]+\s[0-9]+,\s[0-9]+\s+[0-9]+:[0-9]+\s[AM]*[PM]*"
 timestamp_regex2 ="[A-Za-z]+,\s[0-9]+"
+
+# Get the last index of a value from a list
+def getLastIndexOf(a_list, a_value):
+    return len(a_list) - a_list[::-1].index(a_value) - 1
+
+
 # Remove Punctuation
 def remove_punctuation(text):
     text = re.sub(regex, '', text)
@@ -35,7 +42,7 @@ def remove_punctuation(text):
 def clean_content(text):
     
     # Remove html code
-    # Rvery document in this corpus contains only two kinds
+    # Every document in this corpus contains only two kinds
     # of HTML tags
     
     text = re.sub('<html>', '', text)
@@ -60,266 +67,383 @@ def clean_content(text):
     
     return tokens
 
+def retrieve_sentences(text):
+    
+    # Remove html code
+    # Every document in this corpus contains only two kinds
+    # of HTML tags
+    
+    text = re.sub('<html>', '', text)
+    text = re.sub('<pre>', '', text)
+    text = re.sub('</html>', '', text)
+    text = re.sub('</pre>', '', text)
+    
+    # Remove timestamp
+    text = re.sub(timestamp_regex1, '', text)
+    
+    # Remove timestamp
+    text = re.sub(timestamp_regex2, '', text)
+    
+    # Remove numbers towards the end of the file
+    text = re.sub('[0-9]+\s[0-9]+\s[0-9]+','', text)
+    
+    # Remove tabs
+    text = re.sub('\t', ' ', text)
+    
+    # Remove extra \n or \t
+    text = text.strip()
+    
+    # Split into sentences 
+    temp_sentences = re.split('\n\n+', text)
+    
+    # Replace \n
+    # temp_sentences = [re.sub('\n[A-Z]', '. ', s) for s in temp_sentences]
+    # temp_sentences = [re.sub('\n[a-z]', ' ', s) for s in temp_sentences]
+    
+    temp_sentences = [re.sub('\n', ' ', s) for s in temp_sentences]
+    
+    sentences = []
+    
+    for s in temp_sentences:
+        temp_s = s.split(". ")
+        for t_s in temp_s:
+            sentences.append(t_s.strip())
+    
+    return sentences
+
 
 # ### Load the corpus
 
-# In[4]:
+# In[334]:
 
 
-# cwd = os.getcwd()+"/cacm/"
-# list_dir = os.listdir(cwd)
+def generateCorpus(pickle_file_name):
+    cwd = os.getcwd()+"/cacm/"
+    list_dir = os.listdir(cwd)
 
-# corpus_dict = {}
+    full_corpus_dict = {}
 
-# print("Processing all files")
+    print("Processing all files")
 
-# for l in list_dir:
-#     f = open(cwd+l, "r+")
-#     doc_id = l.split(".html")
-#     doc_content=clean_content(f.read())
-#     corpus_dict[doc_id[0]]=doc_content
-    
-# print("Writing to pickle file")
-# pickle.dump(corpus_dict, open(os.getcwd()+"/corpus.p", "wb"))
+    for l in list_dir:
+        f = open(cwd+l, "r+")
+        doc_id = l.split(".html")
+        doc_content=retrieve_sentences(f.read())
+        full_corpus_dict[doc_id[0]]=doc_content
+        
 
-corpus_dict = dict(pickle.load(open(os.getcwd()+"/corpus.p", "rb"), encoding="utf-8"))
+    pickle.dump(full_corpus_dict, open(os.getcwd()+"/"+pickle_file_name+".p", "wb"))
+    print("corpus written to pickle file")
+    return full_corpus_dict
+
+def loadCorpus(pickle_file_name):
+    return dict(pickle.load(open(os.getcwd()+"/"+pickle_file_name+".p", "rb"), encoding="utf-8"))
+
+
+# In[335]:
+
+
+corpus_dict = loadCorpus("corpus")
 print("corpus loaded")
+
+
+# In[336]:
+
+
+corpus_dict['CACM-0270']
 
 
 # ### Generate Document Frequencies (DF)
 
-# In[5]:
-
-
-# print("Constructing inverse map for unigrams for files ")
-# unigram_dict_inverse={}
-# unigram_dict={}
-# for c, words in corpus_dict.items():
-#     unigram_dict_inverse[c] = dict(collections.Counter(words))
-# print("Inverse map constructed") 
-
-# print("Constructing unigrams index")
-# for c, words in unigram_dict_inverse.items():
-#     for word, freq in words.items():
-#         if word not in unigram_dict:
-#             unigram_dict[word] = {}
-#         temp_dict = unigram_dict[word]
-#         temp_dict[c] = freq
-#         unigram_dict[word]=temp_dict
-    
-# print("Unigrams inverted index constructed!")
-# pickle.dump(unigram_dict, open("unigrams.p","wb"))
-
-
-# Write Unigrams Inverted Index to file
-# print("Writing Unigrams inverted index to file")
-# f = open("Unigrams.txt","w+")
-# for k, v in unigram_dict.items():
-#     f.write(k+" : "+str(v)+"\n")
-# f.close()
-
-
-
-# In[ ]:
+# In[337]:
 
 
 # Load unigrams df
 
 unigram_dict=dict(pickle.load(open(os.getcwd()+"/unigrams.p", "rb"), encoding="utf-8"))
 print("Unigrams loaded")
+unigram_dict['algorithms']
 
 
-# In[6]:
+# In[339]:
 
 
-# Generate Term Frequencies (IDF)
+#Calculate IDF
+#IDF(t) = log_e(Total number of documents / Number of documents with term t in it)
 
-# unigram_freq_table={}
-# print("Constructing an inverted index from unigrams")
-# f=open("Unigrams_tf_table.txt","w+")
+def calculateIDF(corpus_dict, unigram_dict):
 
-# # Constructing the term frequency table
-# for k, values in unigram_dict.items():
-#     unigram_freq_table[k]=sum(values.values())
-    
-# print("Frequencies calculated")
-# for k, v in unigram_freq_table.items():
-#     f.write(str((k, v))+"\n")
-    
-# f.close()
+    idf={}
+    N = len(corpus_dict)
+    for term in unigram_dict.keys():
+        idf[term] = math.log(N/len(unigram_dict[term].keys()))
 
+    print("IDFs calculated!")
 
-# pickle.dump(unigram_dict, open("unigrams_tf.p","wb"))
+    pickle.dump(idf, open("idf.p", "wb"))
+    print("IDFs writted to file idf.p")
+    return idf
 
 
-# In[ ]:
+# In[342]:
 
 
-# Load Term Frequencies
-unigram_freq_table=dict(pickle.load(open(os.getcwd()+"/unigrams_tf.p", "rb"), encoding="utf-8"))
-print("Term Frequencies loaded")
+#idf = calculateIDF(corpus_dict, unigram_dict)
+# #or load from memory
+idf = dict(pickle.load(open(os.getcwd()+"/idf.p", "rb"), encoding="utf-8"))
+idf['automatic']
 
 
-# In[12]:
-
-
-# Calculate IDF
-# IDF(t) = log_e(Total number of documents / Number of documents with term t in it)
-
-idf={}
-N = len(corpus_dict)
-for term in unigram_dict.keys():
-    idf[term] = math.log(N/len(unigram_freq_table[term].keys()))
-    
-print("IDF calculated!")
-#TODO : Write to PICKLE FILE and load
-
-
-# In[13]:
+# In[344]:
 
 
 # Calculate TF-IDF for every document per query
-# Sample query - Automatic Implementation
+def queryForResults(query, unigram_dict, corpus_dict):
 
-query = "Automatic Implementation"
-ranked_documents = {}
-unigram_dict['automatic']
-doc_list = []
-for terms in word_tokenize(query.lower()):
-    
-    # Retrieve inverted list for term
-    for k in unigram_dict[terms].keys():
-        if k not in doc_list:
-            doc_list.append(k)
+    ranked_documents = {}
+    unigram_dict['automatic']
+    doc_list = []
+    for terms in word_tokenize(query.lower()):
+
+        # Retrieve inverted list for term
+        for k in unigram_dict[terms].keys():
+            if k not in doc_list:
+                doc_list.append(k)
+
+
+    for d in doc_list:
+        doc_len = len(corpus_dict[d])
+        score = 0.0
+        for term in word_tokenize(query.lower()):
+            if d in unigram_dict[term].keys():
+                tf_term = unigram_dict[term][d]/doc_len
+                idf_term = idf[term]
+                score+= tf_term * idf_term
+        ranked_documents[d]=score
+
+    return ranked_documents
         
-
-for d in doc_list:
-    doc_len = len(corpus_dict[d])
-    score = 0.0
-    for term in word_tokenize(query.lower()):
-        if d in unigram_dict[term].keys():
-            tf_term = unigram_dict[term][d]/doc_len
-            idf_term = idf[term]
-            score+= tf_term * idf_term
-        
-    ranked_documents[d]=score
+def sortByScore(result_set):
+    return sorted(result_set.items(), key=operator.itemgetter(1), reverse=True)
 
 
-# In[14]:
+# In[345]:
 
 
-len(ranked_documents)
+def writeResultsToFile(rank_sort, file_name):
+    output=""
+    f = open(file_name+".txt","w+")
+    for i in range(100):
+        doc, score = rank_sort[i]
+        output+=str(doc)+" : "+str(score)+"\n"
+    f.write(output)
+    f.close()
+    print("done")
 
-# sort by rank 
-rank_sort = sorted(ranked_documents.items(), key=operator.itemgetter(1), reverse=True)
 
-output=""
-f = open("q_test.txt","w+")
-for i in range(100):
-    doc, score = rank_sort[i]
-    output+=str(doc)+" : "+str(score)+"\n"
-f.write(output)
-f.close()
-#output
+# In[346]:
+
+
+# Retrieve results
+rank_sort = sortByScore(queryForResults("Automatic Implementation",unigram_dict, corpus_dict))
+rank_sort[:5]
 
 
 # ### Task 3 
 # 
 # #### Removing stop words from the corpus
 
-# In[16]:
+# In[347]:
 
 
 stop_words = [word.rstrip('\n') for word in open('common_words')]
-#stop_words
+stop_words[:5]
 
 
-# In[20]:
+# In[350]:
 
 
+# Lambda function to produce difference of two LISTS
 diff = lambda l1,l2: [x for x in l1 if x not in l2]
 
 
-# In[107]:
+# In[352]:
 
 
-stopped_corpus = {}
+# Generate corpus - remove all stopwords
+def generateStoppedCorpus(corpus_dict, stop_words):
 
-for doc, content in corpus_dict.items():
-    stopped_corpus[doc] = diff(content, stop_words)
+    stopped_corpus = {}
 
+    for doc, content in corpus_dict.items():
+        temp_list = diff(content, stop_words)
+        stopped_corpus[doc] = " ".join(temp_list)
+        pickle.dump(stopped_corpus, open("stopped_corpus.p","wb"))
+    print("Stopped corpus written to file")
+    return stopped_corpus
+
+stopped_corpus = generateStoppedCorpus(corpus_dict, stop_words)
 print(len(stopped_corpus))
 
-#stopped_corpus
+stopped_corpus['CACM-0270']
 
 
-# In[109]:
+# In[353]:
 
 
-pickle.dump(stopped_corpus, open("stopped_corpus.p","wb"))
-print("Stopped corpus written to file")
-
-#TODO - load stopped corpus the next time
+stopped_corpus = loadCorpus("stopped_corpus")
+stopped_corpus['CACM-0270']
 
 
-# #### Using stemmed corpus
+# ### Using stemmed corpus
 
-# In[100]:
+# In[356]:
 
 
 # Reading and parsing the stemmed corpus
 # provided in cacm_stem.txt
-stemmed_corpus_temp = {}
-with open('cacm_stem.txt') as f:
-    content = f.readlines()
-#print(content)
-pattern = '#\s[0-9]+'
-for item in content:
-    if re.match(pattern, item) :
-        doc_id = re.split('#\s', item.strip())
-        doc_id = doc_id[1]
-        #print(doc_id)
-        stemmed_corpus_temp[doc_id]=[]
-    else:
-        stemmed_corpus_temp[doc_id].append(item.strip())
-stemmed_corpus_temp
+# A separate function was required because loading this corpus required
+# a different set of steps for file processing
+
+def loadStemmedCorpus(file_name):
+
+    stemmed_corpus_temp = {}
+    with open(file_name) as f:
+        content = f.readlines()
+    pattern = '#\s[0-9]+'
+    for item in content:
+        if re.match(pattern, item) :
+            doc_id = re.split('#\s', item.strip())
+            doc_id = doc_id[1]
+            stemmed_corpus_temp[doc_id]=[]
+        else:
+            stemmed_corpus_temp[doc_id].append(item.strip())
+            
+    stemmed_corpus={}
+
+    for doc_id, content in stemmed_corpus_temp.items():
+        new_doc_id = "CACM-"+str(doc_id).zfill(4)
+        stemmed_corpus[new_doc_id]=[]
+        temp_list = []
+        flag = 0
+        for line in content:
+            if re.match('^ *[0-9][0-9 ]*$', line)==None:
+                temp_list.append(line)
+
+        all_content = " ".join(temp_list)
+        
+        #Isolate and remove timestamps
+        split_content = all_content.split('[a-z]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[am|pm]+')[0]
+        final_content=re.sub('[a-z]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[am|pm]+[\s0-9]*','', split_content)
+        stemmed_corpus[new_doc_id].append(final_content)
+        
+        pickle.dump(stemmed_corpus, open("stemmed_corpus.p","wb"))
+        print("Stemmed corpus written to file")
+
+            
+    return stemmed_corpus
+
+stemmed_corpus = loadStemmedCorpus("cacm_stem.txt")
+stemmed_corpus['CACM-3204']
 
 
-# In[108]:
+# In[357]:
 
 
-# Process the content in every document
-# i.e. remove those strings which contain ONLY numbers and timestamps
+stemmed_corpus = loadCorpus("stemmed_corpus")
+stemmed_corpus['CACM-3204']
 
-# Should we index terms like 'ca581001' ?
 
-stemmed_corpus={}
-for doc_id, content in stemmed_corpus_temp.items():
-    new_doc_id = "CACM-"+str(doc_id).zfill(4)
-    stemmed_corpus[new_doc_id]=[]
-    temp_list = []
-    #print(str(doc_id).zfill(4))
-    flag = 0
-    for line in content:
-        if re.match('^ *[0-9][0-9 ]*$', line)==None:
-            temp_list.append(line)
+# ### Snippet Generation
+
+# In[361]:
+
+
+def generateSnippets(rank_sort_temp, full_corpus_dict, query):
+
+    snippets = {}
+
+    for entry in rank_sort_temp:
+        document, score = entry
+        snippets[document] = []
+        
+        for s in full_corpus_dict[document]:
+            first_index = 5
+            end_index = 0
+            temp=[]
+            
+            for term in word_tokenize(query.lower()):
+                temp = word_tokenize(s)
+                temp_lower = word_tokenize(s.lower())
+                flag = False
+                if term in temp_lower :
+                    flag = True
+                    if temp_lower.index(term) < first_index :
+                        first_index = temp_lower.index(term)
+                    if getLastIndexOf(temp_lower, term) >= end_index:
+                        end_index = getLastIndexOf(temp_lower, term)
+
+                if flag == True:
+
+                    if first_index < 5 : 
+                        first_index = 0
+                    else:
+                        first_index -= 5
+                    if (len(temp_lower)-end_index) < 5:
+                        end_index = len(temp_lower)
+                    else:
+                        end_index +=  5
+                    formatted_string = "..."+" ".join(temp[first_index:end_index+1])+"..."
+                    if formatted_string not in snippets[document]:
+                        snippets[document].append(formatted_string)
+
+    return snippets
+
+
+# In[362]:
+
+
+rank_sort_temp = rank_sort[:20]
+snippets = generateSnippets(rank_sort_temp, full_corpus_dict, query)
+
+
+# In[364]:
+
+
+# Generate HTML files for Query Highlighting
+
+def generateHTML(snippets, rank_sort_temp, query):
     
-    all_content = " ".join(temp_list)
-    split_content = all_content.split('[a-z]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[am|pm]+')[0]
-    final_content=re.sub('[a-z]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[am|pm]+[\s0-9]*','', split_content)
-    #print(final_content)
-    stemmed_corpus[new_doc_id].append(final_content)
+    html_file_begin="<html><body><h2>Retrieval results : TF-IDF </h2>"
+    html_file_begin+="<h3> Query : "+query+"</h3>"
+    html_file_begin+="<p>"
+
     
-print(len(stemmed_corpus))
+    for i in range(len(rank_sort_temp)):
+        doc, score = rank_sort_temp[i]
+        sn = snippets[doc]
+        html_file_begin+="<h4>"+doc+"</h4>"
+        for s in sn:
 
-stemmed_corpus
+            for term in word_tokenize(query):
+                if term in s:
+                    s = re.sub(term, "<b>"+term+"</b>", s, re.IGNORECASE)
+                elif term.lower() in s:
+                    s = re.sub(term.lower(), "<b>"+term.lower()+"</b>", s, re.IGNORECASE)
 
+            html_file_begin+=s+"<br>"
+        html_file_begin+="</p><p>"
+    html_file_begin+="</p>"
 
-# In[103]:
+    
+    html_file_begin+="</body></html>"
+    return html_file_begin
 
+html_file = generateHTML(snippets, rank_sort_temp, query)
 
-pickle.dump(stemmed_corpus, open("stemmed_corpus.p","wb"))
-print("Done")
+f = open("query_results.html", "w+")
+f.write(html_file)
+f.close()
 
-#TODO - load stemmed corpus the next time
+html_file
 
