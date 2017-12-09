@@ -4,12 +4,13 @@ import math
 import operator
 import pickle
 import re
+import string
 from collections import OrderedDict
 from tqdm import *
 
 
 def initialize(indexFile):
-    global invertedIndex, queries, corpusDict, corpusSize, k1, b, k2;
+    global invertedIndex, queries, corpusDict, corpusSize, k1, b, k2, R, rel;
 
     #############################
     #######MAGIC NUMBERS#########
@@ -20,7 +21,10 @@ def initialize(indexFile):
 
     corpusDict = {};
     corpusSize = 0;
+    R = {};
+    rel = {};
     invertedIndex = pickle.load( open(indexFile + ".p", "rb"));
+    buildR("cacm.rel.txt");   # build R values from camc.rel
     
     if not os.path.exists("BM25_Output"):
         os.makedirs("BM25_Output");
@@ -45,11 +49,11 @@ def cleanLocation(location):
 
 ## Query string cleaner
 def cleanQuery(query):
-    regex = "[{}':!,;()]*";
-    #regex = "[" + string.punctuation + "]*";
+    #regex = "[{}':!,;+-.()]*";
+    regex = "[" + string.punctuation + "]*";
     query = query.lower();
     query = re.sub(regex, '', query);
-    query = query.replace('"', '');
+    #query = query.replace('"', '');
     regex = "\t\r\n";
     query = re.sub(regex, " ", query);
     query = query.strip();
@@ -144,31 +148,44 @@ def buildDocSet(queryTerms, td):
                 documents.add(d);
     return documents;
 
+## Build R values
+def buildR(fileName):
+    global R, rel;
+    RFile = open(fileName, "r");
+    for i in range(1, 65):
+        rel[i] = [];
+    for line in RFile:
+        rel[int(line.split(" ")[0])] += [line.split(" ")[2]];
+            
+    for d in rel:
+        R[d] = len(rel[d]);
+
 ## Return BM25 Score for given document d
-def generateScores(d, queryTerms, dictionary2, td):
-    global corpusDict, corpusSize, k1, b, k2;
+def generateScores(d, queryTerms, queryID, dictionary2, td):
+    global corpusDict, corpusSize, k1, b, k2, R, rel;
     arg = dictionary2[d] / float(corpusSize/float(len(dictionary2))); # divide by total number of keys
     score = 0;
     for term in queryTerms:
+        r = 0;
+        if term in corpusDict:
+            for dd in corpusDict[term]:
+                if dd[0] in rel[queryID]:
+                    r += 1;
+                
         if term not in corpusDict or d not in corpusDict[term]:
             ifd = 0;
         else:
             ifd = corpusDict[term][d];
-        eq1 = ifd * (k1+1);	  
-        eq2 = queryTerms.count(term) * (k2 + 1);
-        if td[term] == None:
-            eq3 = len(dictionary2);
-            thirdDenominator = (0.5 / float (eq3 + 0.5));
-        else:
-            eq3 = (len(dictionary2) - len(td[term]));
-            thirdDenominator = ((len(td[term]) + 0.5) / float (eq3 + 0.5));
-        first = (eq1 /((b * arg) + (k1 * (1-b)) + ifd));
-        second = (eq2 / (k2 + queryTerms.count(term)));
-        thirdNumerator = 1;
-        
-        if (not (thirdNumerator < 0 and thirdDenominator > 0) or (thirdNumerator > 0 and thirdDenominator < 0)):
-            interim = math.log(thirdNumerator/thirdDenominator) * first * second;
-            score = score + interim;
+
+
+        K = k1 * ((1 - b) + b * arg);
+        if(td[term] != None):
+            num1 = (r + 0.5) / (R[queryID] - r + 0.5);
+            den1 = (len(td[term]) - r + 0.5) / float(corpusSize - len(td[term]) - R[queryID] + r + 0.5);
+            eq1 = (ifd * (k1 + 1)) / (K + ifd);
+            eq2 = (queryTerms.count(term) * (k2 + 1)) / (k2 + queryTerms.count(term));
+            interim = math.log(num1/den1) * eq1 * eq2;
+            score += interim;
     return score;
 
 ## Main method to run the program
@@ -186,7 +203,6 @@ def main():
         content = str(index);
         locations = str(locs);
 
-        
         # cleanup contant and location
         content = cleanContent(content);
         locations = cleanLocation(locations);
@@ -211,11 +227,11 @@ def main():
         queryTerms = query.split(" ");  # split query into query terms
         td = buildTermDocs(queryTerms);  # generate td
         tf = getTermFrequency(queryTerms); # generate tf   
-        documents = buildDocSet(queryTerms, td);    # build document set
+        documents = buildDocSet(queryTerms, td);    # build documinent set
         # Generate BM25 Scores
         BM25Scores = {};
         for d in documents:
-            BM25Scores[d] = generateScores(d, queryTerms, dictionary2, td);
+            BM25Scores[d] = generateScores(d, queryTerms, queryID, dictionary2, td);
 
         # Sort dictionary by their BM25 scores
         sortedDict = OrderedDict(sorted(BM25Scores.items(), key=operator.itemgetter(1), reverse=True)[:k2]);
