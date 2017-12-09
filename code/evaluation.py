@@ -112,10 +112,10 @@ def recallAtK(rel_set, i, num_rel):
     else:
         return 0.0
  
- # Generates a dict per query marking documents as
- # relevant or not
- # Output : {q_1:[R, R, R, N, R], q_2:[N, R, N, N, R]}
- def generateRelevanceSet(query_rel, results):
+# Generates a dict per query marking documents as
+# relevant or not
+# Output : {q_1:[R, R, R, N, R], q_2:[N, R, N, N, R]}
+def generateRelevanceSet(query_rel, results):
     relevance_set = {}
 
     for query_id in query_rel.keys():
@@ -155,7 +155,7 @@ def queryRelevance():
 # 'q_10': 'parallel languages languages for parallel computation',
 # 'q_11': 'setl very high level languages'... }    
 # results : {'q_1':[...list of 100 docs], 'q_2':[...list of 100 docs]}
-def generateResults(queries):
+def generateResults(queries, df, corpus_dict, idf):
 
     results = {}
     count = 1
@@ -166,7 +166,7 @@ def generateResults(queries):
         query = query.lower()
         query = remove_punctuation(query)
         query_id = "q_"+str(count)
-        results[query_id] = sortByScore(queryForResults(query, unigram_dict, corpus_dict, idf))[:100]
+        results[query_id] = sortByScore(queryForResults(query, df, corpus_dict, idf))[:100]
         query_map[query_id] = query
         count = count+1
     return results, query_map
