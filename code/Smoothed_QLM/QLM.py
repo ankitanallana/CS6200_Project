@@ -277,13 +277,13 @@ def main():
     global invertedIndex, queries, corpusDict, corpusSize, maxRank;
     if(len(sys.argv) == 2):
         if(sys.argv[1] == "-stopped"):
-            sysname = "_stopped";
+            sysname = "_Stopped";
             initialize("unigrams_stopped_corpus", "stopped_corpus");   # use stopped corpus
         elif(sys.argv[1] == "-stemmed"):    
-            sysname = "_stemmed";
+            sysname = "_Stemmed";
             initialize("unigrams_stemmed_corpus", "stemmed_corpus");    # use stemmed corpus  
     else:
-        sysname = "_regular";
+        sysname = "_Regular";
         initialize("unigrams", "corpus"); # use regular corpus
     for index, locs in invertedIndex.items():
         #index = indexToContextLocations(index);
