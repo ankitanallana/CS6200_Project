@@ -185,7 +185,6 @@ def queryForResults(query, unigram_dict, corpus_dict, idf):
     #unigram_dict['automatic']
     doc_list = []
     for term in word_tokenize(query.lower()):
-        #print(term)
         
         # Retrieve inverted list for term
         if term in unigram_dict.keys():
@@ -201,7 +200,7 @@ def queryForResults(query, unigram_dict, corpus_dict, idf):
         for term in word_tokenize(query.lower()):
             if term in unigram_dict.keys():
                 if d in unigram_dict[term].keys():
-                    tf_term = unigram_dict[term][d]/doc_len
+                    tf_term = unigram_dict[term][d]/float(doc_len)
                     idf_term = idf[term]
                     score+= tf_term * idf_term
         ranked_documents[d]=score
@@ -215,12 +214,13 @@ def sortByScore(result_set):
 # In[6]:
 
 
-def writeResultsToFile(rank_sort, file_name):
+def writeResultsToFile(rank_sort, file_name, query_id):
     output=""
     f = open(file_name+".txt","w+")
     for i in range(100):
         doc, score = rank_sort[i]
-        output+=str(doc)+" : "+str(score)+"\n"
+        output+=query_id+" "+"Q0 "+ doc + " " + str(i+1) + " " + str(score) + " TF_IDF " + "\n"
+        #output+=str(doc)+" : "+str(score)+"\n"
     f.write(output)
     f.close()
     print("done")
@@ -312,16 +312,18 @@ def loadStemmedCorpus(file_name):
 def generateSnippets(rank_sort_temp, full_corpus_dict, query):
 
     snippets = {}
-
+    
     for entry in rank_sort_temp:
         document, score = entry
         snippets[document] = []
-        
+        count=0
+        sentence_list={}
+
         for s in full_corpus_dict[document]:
             first_index = 5
             end_index = 0
             temp=[]
-            
+            s = s.lower()
             for term in word_tokenize(query.lower()):
                 temp = word_tokenize(s)
                 temp_lower = word_tokenize(s.lower())
@@ -345,10 +347,24 @@ def generateSnippets(rank_sort_temp, full_corpus_dict, query):
                         end_index +=  5
                     formatted_string = "..."+" ".join(temp[first_index:end_index+1])+"..."
                     if formatted_string not in snippets[document]:
-                        snippets[document].append(formatted_string)
-
-    return snippets
-
+                        if count not in sentence_list:
+                            sentence_list[count]=[]
+                        sentence_list[count].append(formatted_string)
+                            
+        count+=1
+        
+        # Extract the longest sentence
+        temp_sentence_list = []
+        max_length=0
+        max_index = 0
+        for index, sentences in sentence_list.items():
+            for i in range(len(sentences)):
+                if len(sentences[i]) > max_length:
+                    max_length = len(sentences[i])
+                    max_index = i
+            temp_sentence_list.append(sentence_list[index][max_index])
+        snippets[document] = temp_sentence_list        
+    return snippets 
 
 # In[11]:
 
@@ -357,23 +373,21 @@ def generateSnippets(rank_sort_temp, full_corpus_dict, query):
 
 def generateHTML(snippets, rank_sort_temp, query):
     
-    html_file_begin="<html><body><h2>Retrieval results : TF-IDF </h2>"
+    html_file_begin="<html><body><h2>Top 20 Retrieval results : TF-IDF </h2>"
     html_file_begin+="<h3> Query : "+query+"</h3>"
     html_file_begin+="<p>"
 
+    query = remove_punctuation(query.lower())
     
     for i in range(len(rank_sort_temp)):
         doc, score = rank_sort_temp[i]
         sn = snippets[doc]
         html_file_begin+="<h4>"+doc+"</h4>"
         for s in sn:
-
             for term in word_tokenize(query):
                 if term in s:
-                    s = re.sub(term, "<b>"+term+"</b>", s, re.IGNORECASE)
-                elif term.lower() in s:
-                    s = re.sub(term.lower(), "<b>"+term.lower()+"</b>", s, re.IGNORECASE)
-
+                    s = re.sub(term+"[\s]+", "<b> "+term+" </b>", s, re.IGNORECASE)
+                
             html_file_begin+=s+"<br>"
         html_file_begin+="</p><p>"
     html_file_begin+="</p>"
@@ -403,3 +417,45 @@ def retrieveQueries(file_path):
         queries.append(q[1].strip());
     return queries
 
+## Calculate Term Frequencies across documents
+
+def generateUnigrams(corpus_dict):
+    unigrams_dict={}
+    for c, words in corpus_dict.items():
+        temp_dict = dict(collections.Counter(words))
+        for k, v in temp_dict.items():
+            if k not in unigrams_dict:
+                unigrams_dict[k]=1
+                
+            else:
+                temp_count = unigrams_dict[k]
+                temp_count += 1
+                unigrams_dict[k] = temp_count
+    
+    pickle.dump(unigrams_dict, open(os.getcwd()+"/unigrams_tf"+".p", "wb"))
+    print("term frequencies across the corpus written to pickle file")
+    return unigrams_dict
+
+## Calculate document frequencies across documents
+
+def generateDocumentFrequencies(corpus_dict):
+    df={}
+    for doc, words in corpus_dict.items():
+        for word in words:
+            if word not in df:
+                temp_dict = {}
+                temp_dict[doc]=1
+                df[word]=temp_dict
+            else:    
+                temp_dict = df[word]
+                if doc in temp_dict.keys():
+                    temp_count = temp_dict[doc]
+                    temp_count+=1
+                    temp_dict[doc] = temp_count
+                    
+                else:
+                    temp_dict[doc]=1
+                df[word] = temp_dict
+    pickle.dump(df, open(os.getcwd()+"/df"+".p", "wb"))
+    print("documents frequencies across the corpus written to pickle file")    
+    return df
