@@ -332,6 +332,7 @@ def main():
         # Write file to disk with given file name
         fileName = "QLM_Output/Query_" + str(queryID) + ".txt";
         writeOutputFile(queryID, fileName, sysname, sortedDict);
-    evaluate(results);   # Evaluate scores generated
+    if(sysname != "_Stemmed"):
+        evaluate(results);   # Evaluate scores generated
         
 main(); # run the program
