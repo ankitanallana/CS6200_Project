@@ -33,13 +33,22 @@ def initialize(indexFile, corpusFile):
     queries = [];
     
     q = "";
-    for query in queryFile:
-        q += query.replace("<DOC>", "").replace("<DOCNO>", "").replace(" </DOCNO>", ":").replace("</DOC>", "#").replace("\n", " ");
-    query = q.split("#");
-    query = query[:-1];
-    for q in query:
-        q = q.split(": ");
-        queries.append(q[1]);
+    if(indexFile == "unigrams_stemmed_corpus"):
+        queryFile = open("cacm_stem.query.txt", "r");
+        for query in queryFile:
+            q += query.replace("\n", "#");
+        query = q.split("#");
+        query = query[:-1];
+        for q in query:
+            queries.append(q);
+    else:
+        for query in queryFile:
+            q += query.replace("<DOC>", "").replace("<DOCNO>", "").replace(" </DOCNO>", ":").replace("</DOC>", "#").replace("\n", " ");
+        query = q.split("#");
+        query = query[:-1];
+        for q in query:
+            q = q.split(": ");
+            queries.append(q[1]);
 
 ## Location string cleaner
 def cleanLocation(location):

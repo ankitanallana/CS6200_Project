@@ -34,13 +34,22 @@ def initialize(indexFile):
     queries = [];
     
     q = "";
-    for query in queryFile:
-        q += query.replace("<DOC>", "").replace("<DOCNO>", "").replace(" </DOCNO>", ":").replace("</DOC>", "#").replace("\n", " ");
-    query = q.split("#");
-    query = query[:-1];
-    for q in query:
-        q = q.split(": ");
-        queries.append(q[1]);
+    if(indexFile == "unigrams_stemmed_corpus"):
+        queryFile = open("cacm_stem.query.txt", "r");
+        for query in queryFile:
+            q += query.replace("\n", "#");
+        query = q.split("#");
+        query = query[:-1];
+        for q in query:
+            queries.append(q);
+    else:        
+        for query in queryFile:
+            q += query.replace("<DOC>", "").replace("<DOCNO>", "").replace(" </DOCNO>", ":").replace("</DOC>", "#").replace("\n", " ");
+        query = q.split("#");
+        query = query[:-1];
+        for q in query:
+            q = q.split(": ");
+            queries.append(q[1]);
 
 ## Location string cleaner
 def cleanLocation(location):
@@ -93,7 +102,7 @@ def buildCorpusDictionary(dictionary):
     return d;
 
 ## Write the output file into the disk in the given format
-def writeOutputFile(id, fileName, dictionary):
+def writeOutputFile(id, fileName, sysname, dictionary):
     os.makedirs(os.path.dirname(fileName), exist_ok=True);
     with open(fileName, "w") as fileName:
         rank = 1;
@@ -104,7 +113,7 @@ def writeOutputFile(id, fileName, dictionary):
                 score = "0" + str(dictionary[key]);
             else:
                 score = str(dictionary[key]);
-            fileName.write(str(id) + "\t\tQ0" + "\t" + str(key) + "\t\t" + str(rank) + "\t" + score + "\t" + "BM25_System\n"); # System name = BM25_System
+            fileName.write(str(id) + "\t\tQ0" + "\t" + str(key) + "\t\t" + str(rank) + "\t" + score + "\t" + "BM25_System" + sysname + "\n"); # System name = BM25_System
             rank = rank + 1;
     fileName.close();
 
@@ -193,10 +202,13 @@ def main():
     global invertedIndex, queries, corpusDict, corpusSize, k2;
     if(len(sys.argv) == 2):
         if(sys.argv[1] == "-stopped"):
+            sysname = "_Stopped";
             initialize("unigrams_stopped_corpus");   # use stopped corpus
         elif(sys.argv[1] == "-stemmed"):    # use stemmed corpus
+            sysname = "_Stemmed";
             initialize("unigrams_stemmed_corpus");  # use regular corpus
     else:
+        sysname = "_Regular";
         initialize("unigrams");
     for index, locs in invertedIndex.items():
         #index = indexToContextLocations(index);
@@ -238,7 +250,7 @@ def main():
 
         # Write file to disk with given file name
         fileName = "BM25_Output/Query_" + str(queryID) + ".txt";
-        writeOutputFile(queryID, fileName, sortedDict);
+        writeOutputFile(queryID, fileName, sysname, sortedDict);
         
 
 main(); # run the program
