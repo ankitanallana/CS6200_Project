@@ -1,0 +1,468 @@
+q_1
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_2
+
+K = 5
+Precision = 0.6
+K = 20
+Precision = 0.15
+
+------------------
+
+q_3
+
+K = 5
+Precision = 0.0
+K = 20
+Precision = 0.0
+
+------------------
+
+q_4
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.05
+
+------------------
+
+q_5
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.05
+
+------------------
+
+q_6
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_7
+
+K = 5
+Precision = 0.6
+K = 20
+Precision = 0.3
+
+------------------
+
+q_8
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_9
+
+K = 5
+Precision = 0.4
+K = 20
+Precision = 0.1
+
+------------------
+
+q_10
+
+K = 5
+Precision = 0.8
+K = 20
+Precision = 0.6
+
+------------------
+
+q_11
+
+K = 5
+Precision = 0.6
+K = 20
+Precision = 0.4
+
+------------------
+
+q_12
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.15
+
+------------------
+
+q_13
+
+K = 5
+Precision = 0.6
+K = 20
+Precision = 0.2
+
+------------------
+
+q_14
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.2
+
+------------------
+
+q_15
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_16
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_17
+
+K = 5
+Precision = 0.4
+K = 20
+Precision = 0.25
+
+------------------
+
+q_18
+
+K = 5
+Precision = 0.0
+K = 20
+Precision = 0.05
+
+------------------
+
+q_19
+
+K = 5
+Precision = 0.8
+K = 20
+Precision = 0.3
+
+------------------
+
+q_20
+
+K = 5
+Precision = 0.4
+K = 20
+Precision = 0.1
+
+------------------
+
+q_21
+
+K = 5
+Precision = 0.0
+K = 20
+Precision = 0.1
+
+------------------
+
+q_22
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_23
+
+K = 5
+Precision = 0.6
+K = 20
+Precision = 0.15
+
+------------------
+
+q_24
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.05
+
+------------------
+
+q_25
+
+K = 5
+Precision = 0.8
+K = 20
+Precision = 0.45
+
+------------------
+
+q_26
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.25
+
+------------------
+
+q_27
+
+K = 5
+Precision = 0.6
+K = 20
+Precision = 0.35
+
+------------------
+
+q_28
+
+K = 5
+Precision = 0.6
+K = 20
+Precision = 0.2
+
+------------------
+
+q_29
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.5
+
+------------------
+
+q_30
+
+K = 5
+Precision = 0.0
+K = 20
+Precision = 0.0
+
+------------------
+
+q_31
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_32
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.05
+
+------------------
+
+q_33
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.05
+
+------------------
+
+q_36
+
+K = 5
+Precision = 0.4
+K = 20
+Precision = 0.4
+
+------------------
+
+q_37
+
+K = 5
+Precision = 0.4
+K = 20
+Precision = 0.2
+
+------------------
+
+q_38
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_39
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.25
+
+------------------
+
+q_40
+
+K = 5
+Precision = 0.4
+K = 20
+Precision = 0.25
+
+------------------
+
+q_42
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.2
+
+------------------
+
+q_43
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.3
+
+------------------
+
+q_44
+
+K = 5
+Precision = 0.4
+K = 20
+Precision = 0.1
+
+------------------
+
+q_45
+
+K = 5
+Precision = 0.8
+K = 20
+Precision = 0.3
+
+------------------
+
+q_48
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_49
+
+K = 5
+Precision = 0.0
+K = 20
+Precision = 0.0
+
+------------------
+
+q_57
+
+K = 5
+Precision = 0.0
+K = 20
+Precision = 0.0
+
+------------------
+
+q_58
+
+K = 5
+Precision = 0.6
+K = 20
+Precision = 0.45
+
+------------------
+
+q_59
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.2
+
+------------------
+
+q_60
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.1
+
+------------------
+
+q_61
+
+K = 5
+Precision = 0.8
+K = 20
+Precision = 0.5
+
+------------------
+
+q_62
+
+K = 5
+Precision = 0.0
+K = 20
+Precision = 0.0
+
+------------------
+
+q_63
+
+K = 5
+Precision = 1.0
+K = 20
+Precision = 0.45
+
+------------------
+
+q_64
+
+K = 5
+Precision = 0.2
+K = 20
+Precision = 0.05
+
+------------------
+

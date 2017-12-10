@@ -7,7 +7,7 @@ import re
 import string
 from collections import OrderedDict
 from tqdm import *
-
+from evaluation import *
 
 def initialize(indexFile):
     global invertedIndex, queries, corpusDict, corpusSize, k1, b, k2, R, rel;
@@ -28,6 +28,9 @@ def initialize(indexFile):
     
     if not os.path.exists("BM25_Output"):
         os.makedirs("BM25_Output");
+
+    if not os.path.exists("Evaluation_Metrics"):
+        os.makedirs("Evaluation_Metrics");
 
     ## Build queries array from query file
     queryFile = open("cacm.query.txt", "r");
@@ -197,6 +200,69 @@ def generateScores(d, queryTerms, queryID, dictionary2, td):
             score += interim;
     return score;
 
+## Build evaluation metrics
+def evaluate(results):
+    query_rel = queryRelevance();
+    relevance_set=generateRelevanceSet(query_rel, results);
+
+    # Calculate MRR
+    mrr_output=calculateMRR(relevance_set);  
+    mrr_output;
+    mrr_output_string="";
+    f=open("Evaluation_Metrics/STOPPED_MRR_TF_IDF.txt", "w+");
+
+    for query, mrr_score in mrr_output.items():
+        mrr_output_string+=query+" : "+str(mrr_score)+"\n";
+    f.write(mrr_output_string);
+    f.close();
+
+    # Calculate P@K
+    f=open("Evaluation_Metrics/STOPPED_P@K_TF_IDF.txt", "w+")
+    pAtKOutput=""
+    for query_id, rel_set in relevance_set.items():
+        pAtKOutput+=query_id+"\n\n"
+        K=5
+        pAtKOutput+="K = "+str(K)+"\n"
+        pAtKOutput+="Precision = "+str(precisionAtK(relevance_set, K, query_id))+"\n"
+        
+        K=20
+        pAtKOutput+="K = "+str(K)+"\n"
+        pAtKOutput+="Precision = "+str(precisionAtK(relevance_set, K, query_id))+"\n"
+        pAtKOutput+="\n------------------\n\n"
+
+    f.write(pAtKOutput)
+    f.close()
+    print("P@K written to file")
+
+    # Calculate Mean Average Precision (MAP)
+
+    f=open("Evaluation_Metrics/STOPPED_MAP_TF_IDF.txt", "w+")
+    mapOutput="MAP SCORES FOR TF IDF \n\n"
+        
+    for query_id in relevance_set.keys():
+        mapOutput+=query_id+" : "+str(calculateMAP(relevance_set, query_id))+"\n"
+        
+    f.write(mapOutput)
+    f.close()
+    print("MAP written to file")
+
+
+    # In[37]:
+
+
+    # Generate all precision tables
+    for query_id in relevance_set.keys():
+        generateAllPrecisionTable(relevance_set, query_id)
+
+
+    # In[38]:
+
+
+    # Generate full Recall tables
+
+    for query_id in relevance_set.keys():
+        generateRecallTable(relevance_set, query_id)
+
 ## Main method to run the program
 def main():
     global invertedIndex, queries, corpusDict, corpusSize, k2;
@@ -231,7 +297,8 @@ def main():
     for key in dictionary2:
             corpusSize += dictionary2[key];
 
-    # Process for each query           
+    # Process for each query
+    results = {};
     queryID = 0
     for query in tqdm(queries):
         queryID = queryID + 1;
@@ -242,15 +309,20 @@ def main():
         documents = buildDocSet(queryTerms, td);    # build documinent set
         # Generate BM25 Scores
         BM25Scores = {};
+        docScorePairs = [];
         for d in documents:
             BM25Scores[d] = generateScores(d, queryTerms, queryID, dictionary2, td);
-
+            docScorePairs += [(d, BM25Scores[d])];
+            
+        docScorePairs = sorted(docScorePairs, key=operator.itemgetter(1), reverse=True);
+        results['q_' + str(queryID)] = docScorePairs;
+        
         # Sort dictionary by their BM25 scores
         sortedDict = OrderedDict(sorted(BM25Scores.items(), key=operator.itemgetter(1), reverse=True)[:k2]);
 
         # Write file to disk with given file name
         fileName = "BM25_Output/Query_" + str(queryID) + ".txt";
         writeOutputFile(queryID, fileName, sysname, sortedDict);
-        
+    evaluate(results);   # Evaluate scores generated
 
 main(); # run the program
