@@ -314,10 +314,10 @@ def loadStemmedCorpus(file_name):
 # In[10]:
 
 
-def generateSnippets(rank_sort_temp, full_corpus_dict, query):
+def generateSnippets(rank_sort_temp, full_corpus_dict, query, n):
 
     snippets = {}
-    
+    rank_sort_temp = rank_sort_temp[:n]
     for entry in rank_sort_temp:
         document, score = entry
         snippets[document] = []
@@ -376,8 +376,10 @@ def generateSnippets(rank_sort_temp, full_corpus_dict, query):
 
 # Generate HTML files for Query Highlighting
 
-def generateHTML(snippets, rank_sort_temp, query):
+def generateHTML(snippets, rank_sort_temp, query, n):
     
+    rank_sort_temp = rank_sort_temp[:n]
+
     html_file_begin="<html><body><h2>Top 20 Retrieval results : TF-IDF </h2>"
     html_file_begin+="<h3> Query : "+query+"</h3>"
     html_file_begin+="<p>"
