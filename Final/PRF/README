@@ -1,16 +1,15 @@
 Running the program
 
 Requirements: Python 2.7 and the associated files in the same folder as the program
-Arguments:
-PATH_TO_CORPUS = "file/path" (corpus directory)
-PATH_TO_STOPWORDS = "file/path" (stopwords file)
-QUERY = 'Automatic Implementation' (Any query)
-TOP_100_DOCUMENTS = 'file/path' (File with on each line the name (ie. CACM-2415 ) of assumed to be relevant documents )
-TOP_TERMS = 5 (terms to be added)
-NEW_DIR_LOCATION = "FILE/PATH/newname" (name and location for storage of cleaned corpus)
+To make the program run, please provide the program with the following GLOBAL variables:
+PATH_TO_CORPUS = "file/path" (This is the path to the corpus directory, called cam)
+PATH_TO_STOPWORDS = "file/path" (This is the path to the stopwords file as we were provided with)
+QUERY = 'Automatic Implementation' (Any query, query words are separated by Strings)
+TOP_100_DOCUMENTS = 'file/path' (This is the path to the file with on each line the name (ie. CACM-2415 ) of assumed to be relevant documents, can be less or more then a 100 lines long)
+TOP_TERMS = 5 (This is the number of terms to be added to the query, this number should be low, as explained in the final project)
+NEW_DIR_LOCATION = "FILE/PATH/newname" (This is the path to a new directory, with a new name for storage of cleaned corpus)
 
-Output
-
-New query
+Output:
+-New query
 
 Output files can be found in the root/data/PRF folder
