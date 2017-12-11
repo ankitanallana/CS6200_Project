@@ -23,6 +23,10 @@ OUTPUT
 ------------
 Output files will be generated in this program folder, QLM_Output folder and Evaluation_Metrics folder
 
+EXTRA
+------------
+The generateCorpusTF.py script generates a pickle file with the term frequency of all words that occur in the corpus
+
 LIBRARIES
 ---------------
 tqdm to display progress of program
