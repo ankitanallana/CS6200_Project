@@ -28,3 +28,6 @@ In each respective folder, Query Results and Evaluation (not required for stemme
 
 Other .py files (apart from the ones mentioned above) are python files which contain helper functions for generating results and evaluation. Text files are the files provided to us (cacm based). The .p files are the pickle files which contain processed corpora & frequencies & IDFs. To generate them again on your computer, you will find a comment just above the lines which read these files(for corpora) - this line can be uncommented and the original line commented so that a fresh pickle file can be generated.
 
+-----
+
+Query_Highlighting <-- this folder contains HTML files generated with query highlighting from the snippets. About 100 documents for all 64 files
