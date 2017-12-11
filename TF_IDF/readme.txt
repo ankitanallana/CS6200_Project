@@ -1,3 +1,14 @@
+There are four folders:
+
+TF-IDF --- Regular TF-IDF
+Stopped Corpus --- TF-IDF run on Stopped Corpus
+Stemmed Corpus --- TF-IDF run on Stemmed Corpus
+Query Highlighting TF_IDF --- HTML files which contain snippets with query highlighting
+
+In first two folders, Query Results and Evaluation (not required for stemmed corpus) have been placed in folders for your review. The Evaluation folder contains three files for P@K, MAP & MRR scores. Two folders with Precision and Recall tables are also present.
+
+-----
+
 To see TF-IDF in action, navigate to the TF_IDF folder and run the TF_IDF_FULL.py file : (enter the following on the command prompt)
 
 python3 TF_IDF_FULL.py
@@ -19,10 +30,6 @@ To see TF-IDF in action, navigate to the Stemmed corpus folder and run the TF_ID
 python3 TF_IDF_stemmed_corpora.py
 
 This file generates results on stemmed corpora.
-
------
-
-In each respective folder, Query Results and Evaluation (not required for stemmed corpus) have been placed in folders for your review. The Evaluation folder contains three files for P@K, MAP & MRR scores. Two folders with Precision and Recall tables are also present.
 
 -----
 
