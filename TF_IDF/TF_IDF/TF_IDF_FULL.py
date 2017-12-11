@@ -93,10 +93,11 @@ for query_id, query_result in results.items():
 
 
 count = 1
+n=20
 for query in queries:
     query_id = "q_"+str(count)
     print(query_id)
-    html_file = generateHTML(generateSnippets(results[query_id], full_corpus_dict, query), results[query_id], query)
+    html_file = generateHTML(generateSnippets(results[query_id], full_corpus_dict, query, n), results[query_id], query, n)
     f = open("query_results_"+query_id+".html", "w+")
     f.write(html_file)
     f.close()
