@@ -1,0 +1,6 @@
+query_id		Q0	doc_id		rank		QLM_score		system_name
+***********************************************************************************************************************************
+57		Q0	CACM-1046		1	-28.615113901171114	QLM_System_stopped
+57		Q0	CACM-1700		2	-28.615113901171114	QLM_System_stopped
+57		Q0	CACM-0397		3	-28.615113901171114	QLM_System_stopped
+57		Q0	CACM-2470		4	-28.615113901171114	QLM_System_stopped
