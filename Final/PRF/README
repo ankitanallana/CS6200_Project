@@ -1,0 +1,16 @@
+Running the program
+
+Requirements: Python 2.7 and the associated files in the same folder as the program
+Arguments:
+PATH_TO_CORPUS = "file/path" (corpus directory)
+PATH_TO_STOPWORDS = "file/path" (stopwords file)
+QUERY = 'Automatic Implementation' (Any query)
+TOP_100_DOCUMENTS = 'file/path' (File with on each line the name (ie. CACM-2415 ) of assumed to be relevant documents )
+TOP_TERMS = 5 (terms to be added)
+NEW_DIR_LOCATION = "FILE/PATH/newname" (name and location for storage of cleaned corpus)
+
+Output
+
+New query
+
+Output files can be found in the root/data/PRF folder
